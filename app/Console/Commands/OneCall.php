@@ -20,7 +20,7 @@ class OneCall extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Test command used for extracting and logging 1 data set from Alpha Vantage API.';
 
     protected $alphaVantageService;
 
