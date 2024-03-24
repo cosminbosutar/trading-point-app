@@ -56,8 +56,6 @@ class GetCompactIntradayData implements ShouldQueue
                 }
             }
 
-            Log::info(print_r($newStockPrices, 1));
-
             /** Save all new data. */
             Stock::insert($newStockPrices);
         }
