@@ -1,12 +1,12 @@
 <?php
 
+use Illuminate\Support\Facades\Schedule;
 use App\Jobs\CacheLatest;
 use App\Jobs\GetCompactIntradayData;
-use Illuminate\Support\Facades\Schedule;
 use App\Services\AlphaVantageService;
 
 
-/** Get the list of stockes to be imported every minute. */
+/** Get the list of stocks to be imported every minute. */
 $symbols = explode(';', env('ALPHA_VANTAGE_STOCKS_LIST', ''));
 $alphaVantageService = new AlphaVantageService;
 
