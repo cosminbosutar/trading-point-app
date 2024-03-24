@@ -20,7 +20,7 @@ return new class extends Migration
             $table->float('high');
             $table->float('low');
             $table->float('close')->index();
-            $table->unsignedBigInteger('volume');
+            $table->unsignedBigInteger('volume'); // Probably can be of type unsignedInteger
 
             $table->timestamps();
 
