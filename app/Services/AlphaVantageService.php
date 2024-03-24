@@ -50,6 +50,7 @@ class AlphaVantageService
             } elseif (array_key_exists('Information', $decodedResponse)) {
                 Log::warning('API rate limit reached!!!!');
             }
+
         } elseif ($response->clientError()) {
             Log::warning('The following client error occured: {error_code} - {error_text}', [
                 'error_code' => $response->status(),
