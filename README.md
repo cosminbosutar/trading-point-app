@@ -1,66 +1,53 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Trading Point App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Used technologies:
+- Laravel 11: As the base technology
+- PostgreSQL: For the database
+- Redis: For caching
+- [Pusher](https://pusher.com/): For real-time notifications and updates
 
-## About Laravel
+[Laradock](https://laradock.io/) is used for local development. It's not mandatory as other local setups can be used as well.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+If you use Laradock, the required containers are 'workspace', 'php-fpm', 'php-worker', 'nginx', 'postgres', 'redis', 'docker-in-docker'.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The 'build.sh', 'up.sh', 'connect.sh', and 'stop.sh' are helper scripts meant to be updated locally to help you with day-to-day Docker commands.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+## Limitations
+The dashboard is hardcoded to work with exactly 10 stocks. This means that you can change the stocks that are configured in the ALPHA_VANTAGE_STOCKS_LIST environment variable, but you MUST ALWAYS have exactly 10 stocks.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+This can be later updated to dynamically create the top cards and the graphs based on the number of stocks specified in the ALPHA_VANTAGE_STOCKS_LIST environment variable.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## How to run
+In order to run the app, you need to meet the following requirements and follow the instructions below:
+- Requirements:
+  - You need a [Pusher](https://pusher.com/) account for real-time updates.
+    - Once you have the account, create a channel and configure these env variables: PUSHER_APP_ID, PUSHER_APP_KEY, PUSHER_APP_SECRET, PUSHER_APP_CLUSTER
+  - You need an [Alpha Vantage API key](https://www.alphavantage.co/support/#api-key).
+    - Just fill in the form, and you'll get a free key that is limited to 25 requests per day
+- Instructions:
+  - Copy .env.example and rename it to .env
+  - Configure the database connection
+  - Configure the Redis connection
+  - Configure the Pusher connection
+  - Configure the Alpha Vantage API connection
+  - Configure [Laravel's scheduler](https://laravel.com/docs/11.x/scheduling#running-the-scheduler)
+  - Run ``` php artisan migrate ``` to create the database
+  - Run the queue worker ``` php artisan queue:work -v ```
+    - Here is the [documentation](https://laravel.com/docs/11.x/queues#running-the-queue-worker)
+  - Configure ``` trading.test ``` in your local ``` hosts ``` file
+  - Open the app [dashboard](trading.test)
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Once the application is configured, the scheduler will execute the tasks configured in [routes/console.php](routes/console.php) that will, in turn, dispatch jobs to be executed by the queue worker.
 
-### Premium Partners
+The scheduled tasks will dispatch a data pull job and a cache update job every minute for every stock option that is configured in the ALPHA_VANTAGE_STOCKS_LIST environment variable.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+The cache update job will also broadcast an event that will update the data from the top 10 cards visible on the dashboard page.
 
-## Contributing
+The graphs' data is NOT updated automatically, and you need to refresh the page to view new data. This can be later added as the infrastructure is already in place.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Closure
+If something is not clear or you need help with running the app, please don't hesitate to write me at cosmin.bosutar@genuineq.com
